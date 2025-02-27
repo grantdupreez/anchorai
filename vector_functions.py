@@ -22,8 +22,8 @@ env = environ.Env()
 environ.Env.read_env()
 
 llm = ChatOpenAI(
-    model="gpt-3.5-turbo",
-    temperature=0.2,
+    model=st.secrets["ai_model"],
+    temperature=st.secrets["ai_temp"],
     api_key=st.secrets["auth_key"],
 )
 
