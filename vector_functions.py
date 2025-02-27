@@ -22,11 +22,12 @@ environ.Env.read_env()
 
 llm = ChatOpenAI(
     model="gpt-3.5-turbo",
-    api_key=st.secrets['auth_key'],
+    temperature=0.2,
+    api_key=st.secrets["auth_key"],
 )
 
 embeddings = OpenAIEmbeddings(
-    api_key=st.secrets['auth_key'],
+    api_key=st.secrets["auth_key"],
 )
 
 text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
