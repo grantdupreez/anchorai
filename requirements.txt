@@ -16,3 +16,4 @@ PyPDF2
 langchain_anthropic
 spacy
 spacytextblob
+en_core_web_sm
