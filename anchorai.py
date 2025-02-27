@@ -369,10 +369,10 @@ def chat_page(chat_id):
                 st.toast("Please enter a link", icon="❗")
 
         # Select the models
-        openai_model = st.selectbox("Select model", ("gpt-3.5-turbo", "gpt-4o-mini"),
-            )
-        openai_temp = st.selectbox("Select temperature", (0, 0.2, 0.4, 0.6, 0.8),
-            )
+#        openai_model = st.selectbox("Select model", ("gpt-3.5-turbo", "gpt-4o-mini"),
+#            )
+#        openai_temp = st.selectbox("Select temperature", (0, 0.2, 0.4, 0.6, 0.8),
+#            )
         
 
 def main():
