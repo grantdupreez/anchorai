@@ -1,5 +1,5 @@
+__import__('pysqlite3')
 import sqlite3
-
 
 # Connect to SQLite database
 def connect_db():
