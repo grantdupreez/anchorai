@@ -3,3 +3,4 @@ openai
 nltk
 pypdf
 llama-index
+llama-index-llms-openai
