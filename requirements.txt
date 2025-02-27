@@ -12,4 +12,5 @@ validators==0.34.0
 fastembed==0.4.2
 PyPDF2
 langchain_anthropic
+spacy
 en_core_web_sm
