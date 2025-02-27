@@ -106,7 +106,7 @@ def chats_home():
         # get previous chats from db
         try:
             previous_chats = list_chats()
-        else:
+        except:
             create_relational_db()
             previous_chats = list_chats()
             
