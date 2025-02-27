@@ -13,4 +13,4 @@ fastembed==0.4.2
 PyPDF2
 langchain_anthropic
 spacy
-en_core_web_sm
+en-core-web-sm== 3.0.0
