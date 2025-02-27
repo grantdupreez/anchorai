@@ -22,7 +22,7 @@ environ.Env.read_env()
 
 llm = ChatOpenAI(
     model="gpt-3.5-turbo",
-    api_key=st.secrets['auth_key']),
+    api_key=st.secrets['auth_key'],
 )
 
 embeddings = OpenAIEmbeddings(
