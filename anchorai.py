@@ -25,7 +25,7 @@ from vector_functions import (
     load_retriever,
     generate_answer_from_context,
     add_documents_to_collection,
-    load_collection
+    load_collection,
 )
 
 def check_password():
