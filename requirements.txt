@@ -15,3 +15,4 @@ duckduckgo_search==7.0.1
 PyPDF2
 langchain_anthropic
 spacy
+spacy_streamlit
