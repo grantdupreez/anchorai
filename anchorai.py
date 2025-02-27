@@ -103,13 +103,7 @@ def chats_home():
     with st.container(border=True):
         st.subheader("Previous Chats")
 
-        # get previous chats from db
-        try:
-            previous_chats = list_chats()
-        except:
-            create_relational_db()
-            previous_chats = list_chats()
-            
+        previous_chats = list_chats()
 
         # Pagination settings
         chats_per_page = 5
