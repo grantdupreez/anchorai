@@ -1,99 +1,99 @@
 import streamlit as st
-import openai
-from llama_index.llms.openai import OpenAI
-from llama_index.core import Settings
-from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
-import hmac
+from PyPDF2 import PdfReader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_community.embeddings.spacy_embeddings import SpacyEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain.tools.retriever import create_retriever_tool
+from dotenv import load_dotenv
+from langchain_anthropic import ChatAnthropic
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain.agents import AgentExecutor, create_tool_calling_agent
 
-def check_password():
-    """Returns `True` if the user had a correct password."""
+import os
+os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
-    def login_form():
-        """Form with widgets to collect user information"""
-        with st.form("Credentials"):
-            st.text_input("Username", key="username")
-            st.text_input("Password", type="password", key="password")
-            st.form_submit_button("Log in", on_click=password_entered)
+embeddings = SpacyEmbeddings(model_name="en_core_web_sm")
+def pdf_read(pdf_doc):
+    text = ""
+    for pdf in pdf_doc:
+        pdf_reader = PdfReader(pdf)
+        for page in pdf_reader.pages:
+            text += page.extract_text()
+    return text
 
-    def password_entered():
-        """Checks whether a password entered by the user is correct."""
-        if st.session_state["username"] in st.secrets[
-            "passwords"
-        ] and hmac.compare_digest(
-            st.session_state["password"],
-            st.secrets.passwords[st.session_state["username"]],
-        ):
-            st.session_state["password_correct"] = True
-            del st.session_state["password"]  # Don't store the username or password.
-            del st.session_state["username"]
-        else:
-            st.session_state["password_correct"] = False
 
-    # Return True if the username + password is validated.
-    if st.session_state.get("password_correct", False):
-        return True
 
-    # Show inputs for username + password.
-    login_form()
-    if "password_correct" in st.session_state:
-        st.error("😕 User not known or password incorrect")
-    return False
+def get_chunks(text):
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+    chunks = text_splitter.split_text(text)
+    return chunks
 
-if not check_password():
-    st.stop()
+
+def vector_store(text_chunks):
     
+    vector_store = FAISS.from_texts(text_chunks, embedding=embeddings)
+    vector_store.save_local("faiss_db")
 
-st.set_page_config(page_title="RAG Chat App")
-st.title("Retrieval Augmented Generation Chat")
 
-openai.api_key = st.secrets['auth_key']
-openai_prompt = st.sidebar.text_area('OpenAI Prompt', """You are an expert on ERP Project Management and project risk management. Assume that all questions are related to managing projects. Keep your answers technical and based on facts – do not hallucinate features.""", 
-                                     height=204)
-
-if "messages" not in st.session_state.keys():  # Initialize the chat messages history
-    st.session_state.messages = [
-        {
-            "role": "assistant",
-            "content": "Ask me a question about ERP Project Management",
-        }
+def get_conversational_chain(tools,ques):
+    #os.environ["ANTHROPIC_API_KEY"]=os.getenv["ANTHROPIC_API_KEY"]
+    #llm = ChatAnthropic(model="claude-3-sonnet-20240229", temperature=0, api_key=os.getenv("ANTHROPIC_API_KEY"),verbose=True)
+    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0, api_key="")
+    prompt = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            """You are a helpful assistant. Answer the question as detailed as possible from the provided context, make sure to provide all the details, if the answer is not in
+    provided context just say, "answer is not available in the context", don't provide the wrong answer""",
+        ),
+        ("placeholder", "{chat_history}"),
+        ("human", "{input}"),
+        ("placeholder", "{agent_scratchpad}"),
     ]
+)
+    tool=[tools]
+    agent = create_tool_calling_agent(llm, tool, prompt)
 
-@st.cache_resource(show_spinner=False)
-def load_data():
-    reader = SimpleDirectoryReader(input_dir="./data", recursive=True)
-    docs = reader.load_data()
-    Settings.llm = OpenAI(
-        model="gpt-3.5-turbo",
-        temperature=0.5,
-        system_prompt=openai_prompt,
-    )
-    with st.expander("Input data (raw)", expanded=False):
-      st.write(docs)
-        
-    index = VectorStoreIndex.from_documents(docs)
-    return index
+    agent_executor = AgentExecutor(agent=agent, tools=tool, verbose=True)
+    response=agent_executor.invoke({"input": ques})
+    print(response)
+    st.write("Reply: ", response['output'])
 
-index = load_data()
 
-if "chat_engine" not in st.session_state.keys():  # Initialize the chat engine
-    st.session_state.chat_engine = index.as_chat_engine(
-        chat_mode="condense_question", verbose=True, streaming=True
-    )
 
-if prompt := st.chat_input(
-    "Ask a question"
-):  # Prompt for user input and save to chat history
-    st.session_state.messages.append({"role": "user", "content": prompt})
+def user_input(user_question):
+    
+    
+    
+    new_db = FAISS.load_local("faiss_db", embeddings,allow_dangerous_deserialization=True)
+    
+    retriever=new_db.as_retriever()
+    retrieval_chain= create_retriever_tool(retriever,"pdf_extractor","This tool is to give answer to queries from the pdf")
+    get_conversational_chain(retrieval_chain,user_question)
 
-for message in st.session_state.messages:  # Write message history to UI
-    with st.chat_message(message["role"]):
-        st.write(message["content"])
 
-# If last message is not from assistant, generate a new response
-if st.session_state.messages[-1]["role"] != "assistant":
-    with st.chat_message("assistant"):
-        response_stream = st.session_state.chat_engine.stream_chat(prompt)
-        st.write_stream(response_stream.response_gen)
-        message = {"role": "assistant", "content": response_stream.response}
-        # Add response to message history
-        st.session_state.messages.append(message)
+
+
+
+def main():
+    st.set_page_config("Chat PDF")
+    st.header("RAG based Chat with PDF")
+
+    user_question = st.text_input("Ask a Question from the PDF Files")
+
+    if user_question:
+        user_input(user_question)
+
+    with st.sidebar:
+        st.title("Menu:")
+        pdf_doc = st.file_uploader("Upload your PDF Files and Click on the Submit & Process Button", accept_multiple_files=True)
+        if st.button("Submit & Process"):
+            with st.spinner("Processing..."):
+                raw_text = pdf_read(pdf_doc)
+                text_chunks = get_chunks(raw_text)
+                vector_store(text_chunks)
+                st.success("Done")
+
+if __name__ == "__main__":
+    main()
