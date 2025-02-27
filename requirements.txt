@@ -97,3 +97,4 @@ watchdog==6.0.0
 yarl==1.18.3
 zstandard==0.23.0
 llama-index
+llama-index-vector-stores-chroma
