@@ -2,7 +2,7 @@ __import__('pysqlite3')
 import sqlite3
 
 # Connect to SQLite database (or create it if it doesn't exist)
-conn = sqlite3.connect("doc_sage.sqlite")
+conn = sqlite3.connect("anchordb.sqlite")
 cursor = conn.cursor()
 
 # Create 'chat' table
