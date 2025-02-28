@@ -171,3 +171,4 @@ yarl==1.17.1
 zipp==3.20.2
 pysqlite3-binary
 networkx
+openpyxl
