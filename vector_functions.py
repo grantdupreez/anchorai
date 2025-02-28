@@ -14,7 +14,7 @@ from langchain_community.document_loaders import (
     Docx2txtLoader,
     UnstructuredHTMLLoader,
     UnstructuredMarkdownLoader,
-    UnstructuredExcelLoader
+    UnstructuredExcelLoader,
 )
 import environ
 
