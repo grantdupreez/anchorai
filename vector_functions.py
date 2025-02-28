@@ -64,8 +64,8 @@ def load_document(file_path: str) -> list[Document]:
     elif file_extension == ".md":
         loader = UnstructuredMarkdownLoader(file_path)
     elif file_extension == ".xlsx":
-        loader = UnstructuredExcelLoader(file_path, mode="elements")
-#        loader = UnstructuredExcelLoader(file_path)
+#        loader = UnstructuredExcelLoader(file_path, mode="elements")
+        loader = UnstructuredExcelLoader(file_path)
     else:
         raise ValueError(f"Unsupported file type: {file_extension}")
 
