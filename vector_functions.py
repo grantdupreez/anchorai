@@ -14,6 +14,7 @@ from langchain_community.document_loaders import (
     Docx2txtLoader,
     UnstructuredHTMLLoader,
     UnstructuredMarkdownLoader,
+    UnstructuredExcelLoader
 )
 import environ
 
@@ -62,6 +63,8 @@ def load_document(file_path: str) -> list[Document]:
         loader = UnstructuredHTMLLoader(file_path)
     elif file_extension == ".md":
         loader = UnstructuredMarkdownLoader(file_path)
+    elif file_extension == ".xlsx":
+        loader = UnstructuredExcelLoader(file_path)
     else:
         raise ValueError(f"Unsupported file type: {file_extension}")
 
