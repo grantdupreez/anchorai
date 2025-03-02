@@ -266,7 +266,7 @@ def chat_page(chat_id):
         else:
             st.write("No documents uploaded.")
 
-        uploaded_file = st.file_uploader("Upload Document", key="file_uploader")
+        uploaded_file = st.file_uploader("Upload Document (*.PDF, *.docx, *.txt or *.csv)", key="file_uploader")
 
         if uploaded_file:
             # Save document content to database
