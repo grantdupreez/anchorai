@@ -15,7 +15,7 @@ langsmith==0.1.139
 mypy-extensions==1.0.0
 nltk==3.9.1
 numpy==1.26.4
-openai==1.53.0
+openai
 pandas==2.2.3
 pillow==10.4.0
 python-dateutil==2.8.2
