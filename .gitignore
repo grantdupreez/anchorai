@@ -1,3 +1,4 @@
+db.sqlite
 *.sqlite
 secrets.toml
 .streamlit/secrets.toml
