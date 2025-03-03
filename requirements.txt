@@ -30,3 +30,5 @@ pysqlite3-binary
 networkx
 openpyxl
 python-environ==0.4.54
+unstructured==0.16.4
+unstructured-client==0.26.2
